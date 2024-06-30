@@ -21,6 +21,13 @@ std::set<int> generateRandomNumbers(int n, int N, int delay)
     return uniqueRandomNumbers;
 }
 
+
+double distance(const std::pair<double, double>& a, const std::pair<double, double>& b)
+{
+    return std::sqrt(std::pow(a.first - b.first, 2) + std::pow(a.second - b.second, 2));
+}
+
+
 int main()
 {
     int die_side, Nfunc, Nred, Nmux;
@@ -53,7 +60,6 @@ int main()
 
     map<pair<int, int>, vector<int>> grid1red;
     map<pair<int, int>, vector<int>> grid2fnc;
-    map<pair<int, int>, bool> done;
     int groupId = 0;
 
     double minx = INT_MAX, maxx = 0, miny = INT_MAX, maxy = 0;
@@ -75,7 +81,7 @@ int main()
 
     double xgap = (maxx - minx) / lines;
     double ygap = (maxy - miny) / lines;
-
+    map<int, bool> done;
     for (int i = 0; i < lines; i++)
     {
         for (int j = 0; j < lines; j++)
@@ -104,9 +110,45 @@ int main()
                     }
                 }
                 ind++;
-            } while (ind <= lines * lines && (grid2fnc[{i, j}].size() == 0 || (grid1red[{i, j}].size() > 0 && (Nfunc / Nred) > (grid2fnc[{i, j}].size() / grid1red[{i, j}].size()))));
+            } while ((ind <= lines + lines/2) && (((grid2fnc[{i, j}].size() == 0) && (grid1red[{i, j}].size() != 0)) || ((grid2fnc[{i, j}].size() != 0) && (grid1red[{i, j}].size() == 0)) || (grid1red[{i, j}].size() > 0 && (double)(Nfunc / Nred) > (double)(grid2fnc[{i, j}].size() / grid1red[{i, j}].size()))));
+            for(int l=0; l<grid2fnc[{i, j}].size(); l++){
+                done[grid2fnc[{i, j}][l]]=true;
+            }
         }
     }
+      for (int k = 0; k < Nfunc; k++){
+        if(!done[k]){
+            double max_dist=(double)INT_MAX;
+            int ind;
+             for (int i = 0; i < Nred; i++){
+                if(distance(fncTsv[k], rdtTsv[i]) < max_dist){
+                   max_dist=distance(fncTsv[k], rdtTsv[i]);
+                   ind = i;
+                }
+             }
+    
+             bool  found=false;
+             for (int i = 0; i < lines; i++)
+                {
+                    for (int j = 0; j < lines; j++)
+                    {
+                        for (auto cord : grid1red[{i, j}])
+                        {
+                            if (cord == ind)
+                            {
+                                found = true;
+                                grid2fnc[{i, j}].push_back(k);
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                    if (found)
+                        break;
+                }
+        }
+      }
 
     int groupid = 1;
     for (int i = 0; i < lines; i++)
@@ -130,7 +172,7 @@ int main()
                 cout << "(" << rdtTsv[idx].first << ',' << rdtTsv[idx].second << ")"
                      << " ";
             }
-            cout << '\n';
+            cout << '\n' << '\n';
             groupid++;
         }
     }
@@ -139,6 +181,8 @@ int main()
     {
         int delay = 200;
         int cnt = 0;
+        int num_of_mux=0, avg_num_of_mux=0;
+        double total_wire_length=0, avg_wire_length=0;
         for (int round = 0; round < 100; round++)
         {
             set<int> faultyOnes = generateRandomNumbers(faulty, Nfunc, delay);
@@ -149,7 +193,7 @@ int main()
             {
                 bool fixed = false, found = false;
 
-                
+                int cnt_of_rdt=0;
                 for (int i = 0; i < lines; i++)
                 {
                     for (int j = 0; j < lines; j++)
@@ -159,34 +203,45 @@ int main()
                             if (cord == idx)
                             {
                                 found = true;
+                                cnt_of_rdt += grid1red[{i, j}].size();
+                                if(!fixed){
                                 for (auto reds : grid1red[{i, j}])
                                 {
                                     if (!usedred[reds])
                                     {
                                         usedred[reds] = true;
                                         fixed = true;
+                                        total_wire_length += distance(fncTsv[idx], rdtTsv[reds]);
                                         break;
                                     }
                                 }
+                                }
                                 break;
+                                
                             }
                         }
-                        if (found)
-                            break;
+                       
                     }
-                    if (found)
-                        break;
+                  
                 }
 
                 if (fixed)
                     totFixed++;
+                num_of_mux += ceil(log2(cnt_of_rdt));
             }
 
-            if (totFixed == faulty)
+            if (totFixed == faulty){
                 cnt++;
+            }
+              avg_wire_length += total_wire_length;
+              total_wire_length=0;
+             avg_num_of_mux += num_of_mux;
+             num_of_mux = 0;
         }
         delay -= 33;
         cout << "recovery rate for N_functional = " << Nfunc << ", N_redundent = " << Nred << " and N_faulty = " << faulty << " is : " << cnt << " percent\n";
+        cout << "Averege minimum wire length required = " << avg_wire_length/100 << "unit " << '\n';
+        cout << "Averege number of mux required = " << ceil(avg_num_of_mux/100) << '\n' << '\n';
     }
 
 return 0;
