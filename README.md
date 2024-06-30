@@ -23,8 +23,7 @@ In the Irregular Grid-Based Grouping Algorithm, we leverage a grid-based method 
    - Allow overlapping of cells to share redundant and functional TSVs between groups.
 3. **Final Adjustment**:
    - If any functional TSVs are left ungrouped, assign them to the nearest group containing at least one redundant TSV.
-     
-![Irregular Grid-Based Grouping Algorithm](link_to_diagram_1)
+
 ## Regular Grouping-Based Recovery Algorithm
 
 The Regular Grouping-Based Recovery Algorithm uses a systematic Breadth-First Search (BFS) tree formation to organize TSVs. This method ensures a structured and uniform process for identifying and replacing faulty TSVs, leveraging a predictable pattern for grouping and recovery.
@@ -55,32 +54,32 @@ To calculate the recovery rate, we have taken 100 rounds for a certain number (n
 
 To calculate the required minimum wire length, we sum the maximum length from each faulty TSV to its corresponding redundant TSV. In the case of the tree-based approach, the required wire length is the maximum path length between a parent and a child node present in the path from a faulty TSV to a redundant TSV.
 
-\[ \text{Wire cost} = \sum_{i=1}^{Nfaulty} d(f_i, r_i) \]
+$$ \text{Wire cost} = \sum_{i=1}^{Nfaulty} d(f_i, r_i) $$
 
-where \( d(f_i, r_i) \) is the Euclidean distance between the i-th faulty TSV (\( f_i \)) and its allocated redundant TSV (\( r_i \)).
+where $( d(f_i, r_i) )$ is the Euclidean distance between the i-th faulty TSV $(f_i)$ and its allocated redundant TSV $(r_i)$.
 
 ## MUX Requirement Calculation
 
 The number of MUXs required can be calculated using the following formula:
 
-\[ \text{Total MUXs} = \sum_{i=1}^{N} \lceil \log_2 (\text{number of redundant TSVs connected to the faulty TSV}) \rceil \]
+$$\text{Total MUXs} = \sum_{i=1}^{N} \lceil \log_2 (\text{number of redundant TSVs connected to the faulty TSV}) \rceil $$
 
 Where:
 - \( N \) is the number of faulty TSVs.
-- \( \lceil x \rceil \) denotes the ceiling function, which rounds up \( x \) to the nearest integer.
+- $( \lceil x \rceil )$ denotes the ceiling function, which rounds up \( x \) to the nearest integer.
 
 ## Diagrams
 
 Below, we provide visual depictions of both approaches. Functional TSVs are represented by black dots, and redundant TSVs by red dots. The diagrams illustrate how each approach handles the random placement of TSVs, showing the differences and efficiencies of the two methods.
 
 ### Irregular Grid-Based Grouping Algorithm
-![Irregular Grid-Based Grouping Algorithm](link_to_diagram_1)
+![Irregular Grouping-Based Recovery Algorithm](https://github.com/codevishal32/Algorithm-for-recovery-of-interconnected-3D-ICs/blob/main/Image/regular.png)
 
 ### Regular Grouping-Based Recovery Algorithm
-![Regular Grouping-Based Recovery Algorithm](link_to_diagram_2)
+![Regular Grid-Based Grouping Algorithm](https://github.com/codevishal32/Algorithm-for-recovery-of-interconnected-3D-ICs/blob/main/Image/TSV%20Allocation.png) ![Regular Grid-Based Grouping Algorithm](https://github.com/codevishal32/Algorithm-for-recovery-of-interconnected-3D-ICs/blob/main/Image/irregular.png)
 
 By visualizing the distribution and recovery process, these diagrams help in understanding how functional TSVs (black dots) are grouped and linked to redundant TSVs (red dots) in the event of faults, thus illustrating the robustness and effectiveness of our proposed recovery solutions.
 
 ---
+[![Document link](https://image.flaticon.com/icons/png/512/337/337946.png)]( https://drive.google.com/file/d/1BJEa-_sTPriYeoWampnLwcxCNFb75EIe/view?usp=sharing)
 
-This README provides a comprehensive overview of our proposed recovery solutions for faulty TSVs in 3D ICs. For further details, refer to the accompanying diagrams and documentation.
